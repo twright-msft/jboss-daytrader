@@ -1,4 +1,4 @@
-DayTrader on Red Hat JBoss EAP
+DayTrader on Red Hat JBoss EAP on Microsoft SQL Server
 ==============================
 This project is a port of the Apache Geronimo project's DayTrader application to run on [JBoss EAP](https://developers.redhat.com/products/eap/overview/) 6 (Java EE 6)
 and JBoss EAP 7 (Java EE 7). It can be built and deployed to a standalone JBoss EAP instance or deployed to
@@ -10,8 +10,9 @@ layer and Java database connectivity (JDBC), Java Message Service (JMS), Enterpr
 and Message-Driven Beans (MDBs) for the back-end business logic and persistence layer.
 
 This project specifically targets Red Hat JBoss EAP and OpenShift, and does not build other optional components for other
-app servers.
+app servers.  
 
+This project is also specifically configured to use Microsoft SQL Server on Linux as the database server.
 
 
 Deploying to OpenShift
@@ -21,7 +22,7 @@ and have basic familiarity with the `oc` command line tool. To deploy to OpenShi
 
 1. Clone this repo
 ```
-git clone https://github.com/jamesfalkner/jboss-daytrader
+git clone https://github.com/twright-msft/jboss-daytrader
 ```
 
 - Login and create a new project in OpenShift to hold your app
@@ -51,9 +52,7 @@ If you wish to switch to using JBoss EAP 7, simply update the BuildConfig to bui
 This will cause a new build and eventually new deployment to be kicked off. If it does not, you can force it with `oc start-build web`.
 To switch back, just roll back to the previous deployment (e.g. `oc rollback web`).
 
-Once the app is deployed, you can access it via the deployed OpenShift Route, with `/daytrader` appended (this is the
-context to which the app is deployed in JBoss EAP). For example, if your project is named `daytrader` and your OpenShift
-default routing suffix is `foo.com` then you could access DayTrader using `http://web-daytrader.foo.com/daytrader`.
+Once the app is deployed, you can access it via the deployed OpenShift Route. For example, if your project is named `daytrader` and your OpenShift default routing suffix is `foo.com` then you could access DayTrader using `http://web-daytrader.foo.com/`.
 
 Builds can take a long time due to the copious amounts of Maven dependencies that must be downloaded. If you wish to save build time, you can setup a Maven Mirror (e.g. using Sonatype's Nexus Repository or JFrog's Artifactory) and point at it
 using the `MAVEN_MIRROR_URL` OpenShift template parameter. For example:
@@ -68,8 +67,6 @@ Before using the app, you must create and populate the Database using these step
 
 1. Navigate to the DayTrader app in browser. You should see the welcome screen.
 2. Navigate to *Configuration* and click *(Re)-create DayTrader Database Tables and Indexes* to create the tables.
-3. Scale the `web` pod count to 0 and back to 1 to reboot EAP (e.g. `oc scale --replicas=0 dc/web && oc scale --replicas=1 dc/web`)
-5. Navigate to *Configuration* and click *(Re)-populate DayTrader Database*
 
 Then you can go to *Trading & Portfolios*, login with the default user ( username: `uid:0` password: `xxx`), click on ticker symbols (such as `s:130`) and click *buy*, or head to *Portfolio* and sell stocks.
 
