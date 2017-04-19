@@ -88,21 +88,6 @@ objects:
       spec:
         containers:
         - env:
-          - name: DB_SERVICE_PREFIX_MAPPING
-            value: web-mssql=DB
-          - name: DB_JNDI
-            value: java:/jdbc/TradeDataSource
-          - name: DB_USERNAME
-            value: sa
-          - name: DB_PASSWORD
-            value: daytrader100
-          - name: DB_DATABASE
-            value: master
-          - name: TX_DATABASE_PREFIX_MAPPING
-            value: web-mssql=DB
-          - name: DB_MIN_POOL_SIZE
-          - name: DB_MAX_POOL_SIZE
-          - name: DB_TX_ISOLATION
           - name: OPENSHIFT_KUBE_PING_LABELS
             value: application=web
           - name: OPENSHIFT_KUBE_PING_NAMESPACE
@@ -225,14 +210,14 @@ objects:
         containers:
         - env:
           - name: SA_PASSWORD
-            value: daytrader100
+            value: daytrader1!
           - name: ACCEPT_EULA
             value: "Y"
-          image: microsoft/mssql-server-linux
+          image: microsoft/mssql-server-linux:latest
           imagePullPolicy: Always
           name: mssql
           ports:
-          - containerPort: 1443
+          - containerPort: 1433
             protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
@@ -245,32 +230,7 @@ objects:
         terminationGracePeriodSeconds: 60
         volumes:
         - name: web-mssql-pvol
-          persistentVolumeClaim:
-            claimName: web-mssql-claim
-    test: false
-    triggers:
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - mssql
-        from:
-          kind: ImageStreamTag
-          name: mssql-server-linux:latest
-          namespace: openshift
-      type: ImageChange
-    - type: ConfigChange
-  status: {}
-
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: web-mssql-claim
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: 2Gi
+          emptyDir: {}
 - apiVersion: v1
   kind: Service
   metadata:
@@ -294,11 +254,11 @@ objects:
     name: web-mssql
   spec:
     ports:
-    - port: 1443
+    - port: 1433
       protocol: TCP
-      targetPort: 1443
+      targetPort: 1433
     selector:
-      deploymentConfig: mwsql
+      deploymentConfig: mssql
     sessionAffinity: None
     type: ClusterIP
 - apiVersion: v1
